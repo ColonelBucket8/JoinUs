@@ -1,8 +1,10 @@
 let express = require("express");
 let app = express();
 let mysql = require("mysql");
+let bodyParser = require("body-parser");
 
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
 
 let connection = mysql.createConnection({
   host: "localhost",
@@ -27,6 +29,16 @@ app.get("/joke", function (req, res) {
 app.get("/random_num", function (req, res) {
   let rand = Math.floor(Math.random() * 10) + 1;
   res.send("Your lucky number is " + rand);
+});
+
+app.post("/register", function (req, res) {
+  let person = {
+    email: req.body.email,
+  };
+  connection.query("INSERT INTO users SET ?", person, function (err, results) {
+    if (err) throw err;
+    res.redirect("/");
+  });
 });
 
 app.listen(3000, function () {
